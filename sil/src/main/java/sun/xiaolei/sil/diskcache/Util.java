@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sun.xiaolei.sil;
+package sun.xiaolei.sil.diskcache;
 
 import java.io.Closeable;
 import java.io.File;
@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Junk drawer of utility methods.
@@ -32,7 +30,7 @@ final class Util {
     static final Charset US_ASCII = Charset.forName("US-ASCII");
     static final Charset UTF_8 = Charset.forName("UTF-8");
 
-    private Util() {
+    Util() {
     }
 
     static String readFully(Reader reader) throws IOException {
@@ -77,30 +75,6 @@ final class Util {
             } catch (Exception ignored) {
             }
         }
-    }
-
-    public static String hashKeyForDisk(String key) {
-        String cacheKey;
-        try {
-            final MessageDigest mDigest = MessageDigest.getInstance("MD5");
-            mDigest.update(key.getBytes());
-            cacheKey = bytesToHexString(mDigest.digest());
-        } catch (NoSuchAlgorithmException e) {
-            cacheKey = String.valueOf(key.hashCode());
-        }
-        return cacheKey;
-    }
-
-    private static String bytesToHexString(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            String hex = Integer.toHexString(0xFF & bytes[i]);
-            if (hex.length() == 1) {
-                sb.append('0');
-            }
-            sb.append(hex);
-        }
-        return sb.toString();
     }
 
 }

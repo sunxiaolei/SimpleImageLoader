@@ -1,9 +1,12 @@
-package sun.xiaolei.sil;
+package sun.xiaolei.sil.cache;
 
 import android.graphics.Bitmap;
 import android.util.LruCache;
 
-/*
+import sun.xiaolei.sil.request.BitmapRequest;
+import sun.xiaolei.sil.util.LogUtil;
+
+/**
  * @author sun
  * description:内存缓存
  */
@@ -26,9 +29,9 @@ public class MemoryCache implements ImageCache {
     }
 
     @Override
-    public Bitmap get(String url) {
-        if (url != null) {
-            Bitmap bitmap = mMemoryCache.get(url);
+    public Bitmap get(BitmapRequest request) {
+        if (request != null) {
+            Bitmap bitmap = mMemoryCache.get(request.imageUri);
             if (bitmap != null) {
                 LogUtil.d("get image from memory cache");
             }
@@ -38,10 +41,10 @@ public class MemoryCache implements ImageCache {
     }
 
     @Override
-    public void put(String url, Bitmap bitmap) {
-        if (url == null || bitmap == null) {
+    public void put(BitmapRequest request, Bitmap bitmap) {
+        if (request == null || bitmap == null) {
             return;
         }
-        mMemoryCache.put(url, bitmap);
+        mMemoryCache.put(request.imageUri, bitmap);
     }
 }

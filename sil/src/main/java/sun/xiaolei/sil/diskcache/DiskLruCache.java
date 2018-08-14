@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sun.xiaolei.sil;
+package sun.xiaolei.sil.diskcache;
 
 import java.io.BufferedWriter;
 import java.io.Closeable;

@@ -13,6 +13,12 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import sun.xiaolei.sil.cache.ImageCache;
+import sun.xiaolei.sil.config.ImageLoaderConfig;
+import sun.xiaolei.sil.request.BitmapRequest;
+import sun.xiaolei.sil.request.RequestQueue;
+import sun.xiaolei.sil.util.LogUtil;
+
 /*
  * @author sun
  * description:
@@ -25,10 +31,8 @@ public class ImageLoader {
      * 图片缓存
      */
     private ImageCache mImageCache;
-    /**
-     * 线程池
-     */
-    private ExecutorService mExecutorService;
+
+    private RequestQueue mRequestQueue;
 
     private ImageLoader() {
     }
@@ -44,8 +48,9 @@ public class ImageLoader {
     public void init(ImageLoaderConfig config) {
         mContext = config.getContext();
         mConfig = config;
-        mExecutorService = Executors.newFixedThreadPool(mConfig.getThreadCount());
-        mImageCache = config.getCachePolicy();
+        mImageCache = config.getCache();
+        mRequestQueue = new RequestQueue(mConfig.getThreadCount());
+        mRequestQueue.start();
     }
 
     public static Context getContext() {
@@ -60,47 +65,6 @@ public class ImageLoader {
             throw new NullPointerException("should init first");
         }
         return mConfig;
-    }
-
-    private Bitmap downloadImage(String imgUrl) {
-        Bitmap bitmap = null;
-        try {
-            URL url = new URL(imgUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            bitmap = BitmapFactory.decodeStream(connection.getInputStream());
-            connection.disconnect();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bitmap;
-    }
-
-    private void submitTask(final String url, final ImageView iv) {
-        iv.setTag(url);
-        mExecutorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                LogUtil.d("download image");
-                final Bitmap bitmap = downloadImage(url);
-                if (bitmap != null) {
-                    mImageCache.put(url, bitmap);
-                    if (url.equals(iv.getTag())) {
-                        iv.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                iv.setImageBitmap(bitmap);
-                            }
-                        });
-                    }
-                } else {
-                    if (errorRes != 0) {
-                        iv.setImageResource(errorRes);
-                    }
-                }
-            }
-        });
     }
 
     private String url;
@@ -129,12 +93,8 @@ public class ImageLoader {
         if (placeRes != 0) {
             iv.setImageResource(placeRes);
         }
-        Bitmap bitmap = mImageCache.get(url);
-        if (bitmap != null) {
-            iv.setImageBitmap(bitmap);
-            return;
-        }
-        submitTask(url, iv);
+        BitmapRequest request = new BitmapRequest(iv, url, null, null);
+        mRequestQueue.addRequest(request);
     }
 
 }

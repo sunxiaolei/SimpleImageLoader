@@ -1,18 +1,25 @@
-package sun.xiaolei.sil;
+package sun.xiaolei.sil.cache;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.text.TextUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import sun.xiaolei.sil.ImageLoader;
+import sun.xiaolei.sil.diskcache.DiskLruCache;
+import sun.xiaolei.sil.request.BitmapRequest;
+import sun.xiaolei.sil.util.LogUtil;
+import sun.xiaolei.sil.util.Md5Util;
+
 import static android.os.Environment.isExternalStorageRemovable;
 
-/*
+/**
  * @author sun
  * description:磁盘缓存
  */
@@ -20,10 +27,14 @@ public class DiskCache implements ImageCache {
 
     private DiskLruCache mDiskCache;
 
-    public DiskCache() {
-        File cacheFile = getDiskCacheDir(ImageLoader.getContext(), ImageLoader.getConfig().getDiskPath());
+    private String diskPath;
+
+    private long cacheMaxSize;//10M;
+
+    public DiskCache(Context mContext, long cacheMaxSize, String diskPath) {
+        File cacheFile = getDiskCacheDir(mContext, diskPath);
         try {
-            mDiskCache = DiskLruCache.open(cacheFile, 1, 1, ImageLoader.getConfig().getCacheMaxSize());
+            mDiskCache = DiskLruCache.open(cacheFile, 1, 1, cacheMaxSize);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -39,10 +50,10 @@ public class DiskCache implements ImageCache {
     }
 
     @Override
-    public Bitmap get(String url) {
+    public Bitmap get(BitmapRequest request) {
         Bitmap bitmap;
         try {
-            DiskLruCache.Snapshot snapshot = mDiskCache.get(Util.hashKeyForDisk(url));
+            DiskLruCache.Snapshot snapshot = mDiskCache.get(request.imageUriMd5);
             if (snapshot != null) {
                 LogUtil.d("get image from disk cache");
                 bitmap = BitmapFactory.decodeStream(snapshot.getInputStream(0));
@@ -55,10 +66,10 @@ public class DiskCache implements ImageCache {
     }
 
     @Override
-    public void put(String url, Bitmap bitmap) {
+    public void put(BitmapRequest request, Bitmap bitmap) {
         try {
             //URL经过MD5加密生成唯一的key值，避免URL中可能含有非法字符问题
-            DiskLruCache.Editor editor = mDiskCache.edit(Util.hashKeyForDisk(url));
+            DiskLruCache.Editor editor = mDiskCache.edit(request.imageUriMd5);
             OutputStream os = editor.newOutputStream(0);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -67,6 +78,34 @@ public class DiskCache implements ImageCache {
             editor.commit();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static class Builder {
+
+        private Context context;
+
+        private String diskPath = "il_def_cache";
+
+        private long cacheMaxSize = 1024 * 1024 * 10;//10M;
+
+        public Builder setDiskPath(String path) {
+            if (!TextUtils.isEmpty(path)) {
+                this.diskPath = path;
+            }
+            return this;
+        }
+
+        public Builder setCacheMaxSize(long size) {
+            if (size > 0) {
+                this.cacheMaxSize = size;
+            }
+            return this;
+        }
+
+        public DiskCache create() {
+            DiskCache cache = new DiskCache(context, cacheMaxSize, diskPath);
+            return cache;
         }
     }
 }
