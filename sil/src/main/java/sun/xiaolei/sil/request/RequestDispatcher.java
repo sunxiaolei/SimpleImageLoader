@@ -43,7 +43,7 @@ public class RequestDispatcher extends Thread {
                 imageLoader.loadImage(request);
             }
         } catch (InterruptedException e) {
-            LogUtil.d("### 请求分发器退出");
+            LogUtil.d("请求分发器退出");
         }
     }
 
@@ -55,7 +55,7 @@ public class RequestDispatcher extends Thread {
         if (uri.contains("://")) {
             return uri.split("://")[0];
         } else {
-            LogUtil.e("### wrong scheme, image uri is : " + uri);
+            LogUtil.e("wrong scheme, image uri is : " + uri);
         }
 
 

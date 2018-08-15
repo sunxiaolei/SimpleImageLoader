@@ -17,7 +17,7 @@ public class RequestQueue {
     /**
      * 优先级请求队列
      */
-    private BlockingDeque<BitmapRequest> mRequestQueue = (BlockingDeque<BitmapRequest>) new PriorityBlockingQueue<BitmapRequest>();
+    private PriorityBlockingQueue<BitmapRequest> mRequestQueue = new PriorityBlockingQueue<>();
 
     /**
      * 请求的序列化生成器 给每一个请求分配一个序列号
@@ -57,7 +57,7 @@ public class RequestQueue {
     private final void startDispatchers() {
         mDispatchers = new RequestDispatcher[mDispatcherNums];
         for (int i = 0; i < mDispatcherNums; i++) {
-            LogUtil.d("### 启动线程 " + i);
+            LogUtil.d("启动线程 " + i);
             mDispatchers[i] = new RequestDispatcher(mRequestQueue);
             mDispatchers[i].start();
         }
@@ -89,7 +89,7 @@ public class RequestQueue {
             request.serialNum = this.generateSerialNumber();
             mRequestQueue.add(request);
         } else {
-            LogUtil.d("### 请求队列中已经含有");
+            LogUtil.d("请求队列中已经含有");
         }
     }
 

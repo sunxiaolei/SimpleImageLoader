@@ -22,8 +22,8 @@ public class BitmapRequest implements Comparable<BitmapRequest> {
     Reference<ImageView> mImageViewRef;
     public DisplayConfig displayConfig;
     public ImageLoaderListener imageListener;
-    public String imageUri = "";
-    public String imageUriMd5 = "";
+    public String imageUri;
+    public String imageUriMd5;
     /**
      * 请求序列号
      */

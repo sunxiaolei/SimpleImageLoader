@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import sun.xiaolei.sil.ImageLoader;
 import sun.xiaolei.sil.cache.ImageCache;
 import sun.xiaolei.sil.request.BitmapRequest;
+import sun.xiaolei.sil.util.LogUtil;
 
 /**
  * @author sun
@@ -24,6 +25,7 @@ public abstract class AbsLoader implements Loader {
         if (bitmap == null) {
             bitmap = onLoadImage(request);
         }
+        mCache.put(request, bitmap);
         deliveryToUIThread(request, bitmap);
     }
 

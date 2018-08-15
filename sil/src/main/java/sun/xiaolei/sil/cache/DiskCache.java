@@ -70,12 +70,14 @@ public class DiskCache implements ImageCache {
         try {
             //URL经过MD5加密生成唯一的key值，避免URL中可能含有非法字符问题
             DiskLruCache.Editor editor = mDiskCache.edit(request.imageUriMd5);
-            OutputStream os = editor.newOutputStream(0);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            os.write(baos.toByteArray());
-            os.close();
-            editor.commit();
+            if (editor != null) {
+                OutputStream os = editor.newOutputStream(0);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                os.write(baos.toByteArray());
+                os.close();
+                editor.commit();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

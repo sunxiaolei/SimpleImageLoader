@@ -9,5 +9,5 @@ import sun.xiaolei.sil.request.BitmapRequest;
  */
 public interface LoadPolicy {
 
-    public int compare(BitmapRequest request1, BitmapRequest request2);
+    int compare(BitmapRequest request1, BitmapRequest request2);
 }

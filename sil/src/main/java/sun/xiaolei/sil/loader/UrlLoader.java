@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import sun.xiaolei.sil.request.BitmapRequest;
+import sun.xiaolei.sil.util.LogUtil;
 
 /**
  * @author sun
@@ -18,6 +19,7 @@ import sun.xiaolei.sil.request.BitmapRequest;
 public class UrlLoader extends AbsLoader {
     @Override
     public Bitmap onLoadImage(BitmapRequest request) {
+        LogUtil.d("get image from url");
         Bitmap bitmap = null;
         try {
             URL url = new URL(request.imageUri);

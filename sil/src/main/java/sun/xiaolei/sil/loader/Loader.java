@@ -9,5 +9,5 @@ import sun.xiaolei.sil.request.BitmapRequest;
  */
 public interface Loader {
 
-    public void loadImage(BitmapRequest request);
+    void loadImage(BitmapRequest request);
 }

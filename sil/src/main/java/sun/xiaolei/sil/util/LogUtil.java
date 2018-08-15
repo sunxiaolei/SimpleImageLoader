@@ -8,7 +8,7 @@ import android.util.Log;
  */
 public class LogUtil {
 
-    private static final String TAG = "ImageLoader";
+    private static final String TAG = "ImageLoader ###";
 
     public static void e(String msg) {
         Log.e(TAG, msg);
